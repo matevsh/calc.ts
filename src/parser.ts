@@ -7,7 +7,10 @@ export function parser(tokens: Token[]): ExpressionNode {
     for (const token of tokens) {
         if (token.type === 'NUMBER') {
             expressionStack.push({ type: TokenType.NUMBER, value: token.value })
-        } else if (token.type === 'OPERATOR') {
+            continue
+        }
+
+        if (token.type === 'OPERATOR') {
             while (
                 operatorStack.length > 0 &&
                 token.precedence <=

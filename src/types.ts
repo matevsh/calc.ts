@@ -17,10 +17,17 @@ export type OperatorToken = {
 
 export type Token = NumberToken | OperatorToken
 
-export type ExpressionNode = {
-    type: TokenType
-    value?: number | string
-    precedence?: number
-    left?: ExpressionNode
-    right?: ExpressionNode
+type ExpressionNumberNode = {
+    type: TokenType.NUMBER
+    value: number
 }
+
+type ExpressionOperatorNode = {
+    type: TokenType.OPERATOR
+    value: string
+    precedence: number
+    left: ExpressionNode
+    right: ExpressionNode
+}
+
+export type ExpressionNode = ExpressionNumberNode | ExpressionOperatorNode
