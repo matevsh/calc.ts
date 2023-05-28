@@ -36,7 +36,10 @@ export function parser(tokens: Token[]): ExpressionNode {
         if (token.type === 'OPERATOR') {
             const prevOperator = operatorStack[operatorStack.length - 1]
 
-            while (token.precedence <= prevOperator?.precedence) {
+            while (
+                operatorStack.length &&
+                token.precedence <= prevOperator?.precedence
+            ) {
                 createExpression(expressionStack, operatorStack)
             }
 
