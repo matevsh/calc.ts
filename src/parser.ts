@@ -1,8 +1,14 @@
-import { ExpressionNode, OperatorToken, Token, TokenType } from './types'
+import {
+    ExpressionNode,
+    OperatorNode,
+    OperatorToken,
+    Token,
+    TokenType,
+} from './types'
 
-function createExpression(expr: ExpressionNode[], oper: OperatorToken[]) {
+function createExpression(expr: ExpressionNode[], oper: OperatorNode[]) {
     const operatorToken = oper.pop()
-    if (!operatorToken) {
+    if (!operatorToken || operatorToken.type !== TokenType.OPERATOR) {
         throw new Error('Nieprawidłowy token operatora')
     }
 
@@ -10,7 +16,7 @@ function createExpression(expr: ExpressionNode[], oper: OperatorToken[]) {
     const left = expr.pop()
 
     if (!right || !left) {
-        throw new Error('Nieprawidłowe drzewo składniowe')
+        throw new Error(`Nieprawidłowe drzewo składniowe ${expr} ${oper}`)
     }
 
     const operatorNode: ExpressionNode = {
@@ -23,27 +29,46 @@ function createExpression(expr: ExpressionNode[], oper: OperatorToken[]) {
     expr.push(operatorNode)
 }
 
-export function parser(tokens: Token[]): ExpressionNode {
+export function parser(tokens: Token[]): ExpressionNode | undefined {
     const expressionStack: ExpressionNode[] = []
-    const operatorStack: OperatorToken[] = []
+    const operatorStack: OperatorNode[] = []
 
     for (const token of tokens) {
-        if (token.type === 'NUMBER') {
+        if (token.type === TokenType.NUMBER) {
             expressionStack.push({ type: TokenType.NUMBER, value: token.value })
             continue
         }
 
-        if (token.type === 'OPERATOR') {
-            const prevOperator = operatorStack[operatorStack.length - 1]
-
+        if (token.type === TokenType.OPERATOR) {
             while (
                 operatorStack.length &&
-                token.precedence <= prevOperator?.precedence
+                operatorStack.at(-1)?.type === TokenType.OPERATOR &&
+                token.precedence <=
+                    (operatorStack.at(-1) as OperatorToken)?.precedence
             ) {
                 createExpression(expressionStack, operatorStack)
             }
 
             operatorStack.push(token)
+            continue
+        }
+
+        if (token.type === TokenType.LEFT_PAREN) {
+            operatorStack.push(token)
+            continue
+        }
+
+        if (token.type === TokenType.RIGHT_PAREN) {
+            while (
+                operatorStack.length &&
+                operatorStack.at(-1)?.type !== TokenType.LEFT_PAREN
+            ) {
+                createExpression(expressionStack, operatorStack)
+            }
+
+            if (operatorStack.at(-1)?.type === TokenType.LEFT_PAREN) {
+                operatorStack.pop()
+            }
         }
     }
 
@@ -55,5 +80,5 @@ export function parser(tokens: Token[]): ExpressionNode {
         throw new Error('Nieprawidłowe drzewo składniowe')
     }
 
-    return expressionStack[0]
+    return expressionStack.at(0)
 }

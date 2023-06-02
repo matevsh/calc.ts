@@ -1,12 +1,8 @@
 export enum TokenType {
-    NUMBER = 'NUMBER',
-    OPERATOR = 'OPERATOR',
-}
-
-export type NumberToken = {
-    type: 'NUMBER'
-    value: number
-    precedence: number
+    NUMBER,
+    OPERATOR,
+    LEFT_PAREN,
+    RIGHT_PAREN,
 }
 
 export type OperatorToken = {
@@ -15,12 +11,26 @@ export type OperatorToken = {
     precedence: number
 }
 
-export type Token = NumberToken | OperatorToken
-
-type ExpressionNumberNode = {
+type NumberToken = {
     type: TokenType.NUMBER
     value: number
 }
+
+type LeftParenToken = {
+    type: TokenType.LEFT_PAREN
+    value: '('
+}
+
+type RightParenToken = {
+    type: TokenType.RIGHT_PAREN
+    value: ')'
+}
+
+export type Token =
+    | NumberToken
+    | OperatorToken
+    | LeftParenToken
+    | RightParenToken
 
 type ExpressionOperatorNode = {
     type: TokenType.OPERATOR
@@ -30,4 +40,5 @@ type ExpressionOperatorNode = {
     right: ExpressionNode
 }
 
-export type ExpressionNode = ExpressionNumberNode | ExpressionOperatorNode
+export type ExpressionNode = NumberToken | ExpressionOperatorNode
+export type OperatorNode = OperatorToken | LeftParenToken

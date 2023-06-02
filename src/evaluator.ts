@@ -1,6 +1,10 @@
 import { ExpressionNode, TokenType } from './types'
 
-export function evaluateAST(ast: ExpressionNode): number | undefined {
+export function evaluateAST(
+    ast: ExpressionNode | undefined
+): number | undefined {
+    if (!ast) return undefined
+
     if (ast.type === TokenType.NUMBER) {
         return ast.value
     }

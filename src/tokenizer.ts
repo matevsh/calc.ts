@@ -1,3 +1,17 @@
+// [
+//     { type: 'OPERATOR', value: '(', precedence: 3 },
+//     { type: 'OPERATOR', value: '(', precedence: 3 },
+//     { type: 'NUMBER', value: 2, precedence: 0 },
+//     { type: 'OPERATOR', value: '+', precedence: 1 },
+//     { type: 'NUMBER', value: 2, precedence: 0 },
+//     { type: 'OPERATOR', value: ')', precedence: 3 },
+//     { type: 'OPERATOR', value: '*', precedence: 2 },
+//     { type: 'NUMBER', value: 2, precedence: 0 },
+//     { type: 'OPERATOR', value: ')', precedence: 3 },
+//     { type: 'OPERATOR', value: '+', precedence: 1 },
+//     { type: 'NUMBER', value: 2, precedence: 0 }
+// ]
+
 import { type Token, TokenType } from './types'
 
 const NUMBERS = '0123456789'
@@ -5,11 +19,12 @@ const OPERATORS = '+-*/'
 
 type PrecedenceKey = keyof typeof OPERATOR_PRECEDENCE
 const OPERATOR_PRECEDENCE = {
-    num: 0,
     '+': 1,
     '-': 1,
     '*': 2,
     '/': 2,
+    '(': 3,
+    ')': 3,
 }
 
 function findNumber(input: string) {
@@ -38,6 +53,18 @@ export function tokenizer(input: string) {
     while (input) {
         const [char] = input
 
+        if (char === '(') {
+            tokens.push({ type: TokenType.LEFT_PAREN, value: '(' })
+            input = input.slice(1)
+            continue
+        }
+
+        if (char === ')') {
+            tokens.push({ type: TokenType.RIGHT_PAREN, value: ')' })
+            input = input.slice(1)
+            continue
+        }
+
         if (NUMBERS.includes(char)) {
             const { value, len } = findNumber(input)
             input = input.slice(len)
@@ -45,7 +72,6 @@ export function tokenizer(input: string) {
             tokens.push({
                 type: TokenType.NUMBER,
                 value,
-                precedence: OPERATOR_PRECEDENCE.num,
             })
             continue
         }
